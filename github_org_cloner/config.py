@@ -3,7 +3,6 @@
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 
 from dotenv import load_dotenv
 
@@ -25,19 +24,19 @@ class Config:
     """
 
     base_dir: Path
-    github_token: Optional[str]
+    github_token: str | None
     parallel: bool = False
-    max_workers: Optional[int] = None
+    max_workers: int | None = None
     run_setup: bool = False
     dry_run: bool = False
 
     @classmethod
     def from_args(
         cls,
-        base_dir: Optional[str] = None,
-        github_token: Optional[str] = None,
+        base_dir: str | None = None,
+        github_token: str | None = None,
         parallel: bool = False,
-        max_workers: Optional[int] = None,
+        max_workers: int | None = None,
         run_setup: bool = False,
         dry_run: bool = False,
     ) -> "Config":
@@ -60,7 +59,8 @@ class Config:
             A Config instance.
 
         Raises:
-            ValueError: If base_dir is not provided via argument, environment variable, or .env file.
+            ValueError: If base_dir is not provided via argument,
+                environment variable, or .env file.
         """
         # Determine base directory from CLI arg or env var (which includes .env)
         final_base_dir = base_dir or os.getenv("GITHUB_ORG_CLONE_BASE_DIR")

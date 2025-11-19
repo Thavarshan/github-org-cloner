@@ -42,17 +42,12 @@ def run_optional_setup(repo_path: Path, auto_run: bool = False) -> None:
                 if result.stdout:
                     logger.debug(f"Setup output: {result.stdout}")
             except subprocess.CalledProcessError as e:
-                logger.error(
-                    f"Setup script failed for {repo_path.name}: {e.stderr}"
-                )
+                logger.error(f"Setup script failed for {repo_path.name}: {e.stderr}")
             except subprocess.TimeoutExpired:
-                logger.error(
-                    f"Setup script timeout for {repo_path.name} (exceeded 5 minutes)"
-                )
+                logger.error(f"Setup script timeout for {repo_path.name} (exceeded 5 minutes)")
         else:
             logger.info(
-                f"  Found setup.sh in {repo_path.name}. "
-                "Run it manually or use --run-setup flag."
+                f"  Found setup.sh in {repo_path.name}. " "Run it manually or use --run-setup flag."
             )
 
     # Check for Node.js project
@@ -74,35 +69,32 @@ def run_optional_setup(repo_path: Path, auto_run: bool = False) -> None:
             "You may want to create a virtual environment and install dependencies:"
         )
         if pyproject_toml.exists():
-            logger.info(f"    python -m venv venv && source venv/bin/activate && pip install -e .")
+            logger.info("    python -m venv venv && source venv/bin/activate && pip install -e .")
         elif requirements_txt.exists():
             logger.info(
-                f"    python -m venv venv && source venv/bin/activate && "
-                f"pip install -r requirements.txt"
+                "    python -m venv venv && source venv/bin/activate && "
+                "pip install -r requirements.txt"
             )
 
     # Check for Ruby project
     gemfile = repo_path / "Gemfile"
     if gemfile.exists():
         logger.info(
-            f"  Detected Ruby project in {repo_path.name}. "
-            "You may want to run 'bundle install'."
+            f"  Detected Ruby project in {repo_path.name}. " "You may want to run 'bundle install'."
         )
 
     # Check for Go project
     go_mod = repo_path / "go.mod"
     if go_mod.exists():
         logger.info(
-            f"  Detected Go project in {repo_path.name}. "
-            "You may want to run 'go mod download'."
+            f"  Detected Go project in {repo_path.name}. " "You may want to run 'go mod download'."
         )
 
     # Check for Rust project
     cargo_toml = repo_path / "Cargo.toml"
     if cargo_toml.exists():
         logger.info(
-            f"  Detected Rust project in {repo_path.name}. "
-            "You may want to run 'cargo build'."
+            f"  Detected Rust project in {repo_path.name}. " "You may want to run 'cargo build'."
         )
 
     # Check for Makefile

@@ -4,7 +4,6 @@ import logging
 import subprocess
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
-from typing import Optional
 
 from .github_client import Repository
 
@@ -13,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 class CloneError(Exception):
     """Raised when a repository clone operation fails."""
+
     pass
 
 
@@ -21,7 +21,7 @@ def clone_repository(
     org_name: str,
     base_dir: Path,
     dry_run: bool = False,
-) -> tuple[str, bool, Optional[str]]:
+) -> tuple[str, bool, str | None]:
     """Clone a single repository.
 
     Args:
@@ -54,7 +54,7 @@ def clone_repository(
 
     try:
         # Run git clone
-        result = subprocess.run(
+        subprocess.run(
             ["git", "clone", repo.clone_url, str(target_path)],
             capture_output=True,
             text=True,
@@ -75,10 +75,10 @@ def clone_repository(
         logger.error(error_msg)
         return (repo.name, False, error_msg)
 
-    except FileNotFoundError:
+    except FileNotFoundError as err:
         error_msg = "git command not found. Please ensure git is installed and in your PATH."
         logger.error(error_msg)
-        raise CloneError(error_msg)
+        raise CloneError(error_msg) from err
 
 
 def clone_all_repositories(
@@ -86,9 +86,9 @@ def clone_all_repositories(
     org_name: str,
     base_dir: Path,
     parallel: bool = False,
-    max_workers: Optional[int] = None,
+    max_workers: int | None = None,
     dry_run: bool = False,
-) -> dict[str, tuple[bool, Optional[str]]]:
+) -> dict[str, tuple[bool, str | None]]:
     """Clone all repositories for an organization.
 
     Args:

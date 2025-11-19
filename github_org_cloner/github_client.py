@@ -2,7 +2,6 @@
 
 import re
 from dataclasses import dataclass
-from typing import Optional
 from urllib.parse import urlparse
 
 import requests
@@ -22,21 +21,24 @@ class Repository:
     name: str
     clone_url: str
     ssh_url: str
-    description: Optional[str]
+    description: str | None
 
 
 class GitHubAPIError(Exception):
     """Base exception for GitHub API errors."""
+
     pass
 
 
 class OrganizationNotFoundError(GitHubAPIError):
     """Raised when an organization is not found."""
+
     pass
 
 
 class RateLimitError(GitHubAPIError):
     """Raised when GitHub API rate limit is exceeded."""
+
     pass
 
 
@@ -46,7 +48,7 @@ class GitHubClient:
     BASE_URL = "https://api.github.com"
     PER_PAGE = 100  # Maximum allowed by GitHub API
 
-    def __init__(self, token: Optional[str] = None):
+    def __init__(self, token: str | None = None):
         """Initialize the GitHub client.
 
         Args:
@@ -126,7 +128,7 @@ class GitHubClient:
 
         while True:
             url = f"{self.BASE_URL}/orgs/{org_name}/repos"
-            params = {
+            params: dict[str, str | int] = {
                 "per_page": self.PER_PAGE,
                 "page": page,
                 "type": "all",  # Include all repo types
@@ -153,9 +155,7 @@ class GitHubClient:
                         "Consider providing a GitHub token for higher limits."
                     )
                 else:
-                    raise GitHubAPIError(
-                        f"Access forbidden (403): {response.text}"
-                    )
+                    raise GitHubAPIError(f"Access forbidden (403): {response.text}")
             elif response.status_code != 200:
                 raise GitHubAPIError(
                     f"GitHub API request failed with status {response.status_code}: "

@@ -5,8 +5,6 @@ import getpass
 import logging
 import os
 import sys
-from pathlib import Path
-from typing import Optional
 
 from . import __version__
 from .cloner import clone_all_repositories
@@ -34,7 +32,7 @@ def setup_logging(verbose: bool = False) -> None:
     )
 
 
-def get_github_token(token_arg: Optional[str]) -> Optional[str]:
+def get_github_token(token_arg: str | None) -> str | None:
     """Get GitHub token from argument, environment, or user input.
 
     Args:
@@ -145,7 +143,7 @@ Environment Variables:
     return parser.parse_args()
 
 
-def get_org_url(org_url_arg: Optional[str]) -> str:
+def get_org_url(org_url_arg: str | None) -> str:
     """Get organization URL from argument or user input.
 
     Args:
@@ -259,11 +257,7 @@ def main() -> None:
             run_setup_for_all(successful_repos, auto_run=True)
 
     # Check if any clones failed
-    failed_repos = [
-        repo_name
-        for repo_name, (success, _) in results.items()
-        if not success
-    ]
+    failed_repos = [repo_name for repo_name, (success, _) in results.items() if not success]
 
     if failed_repos:
         logger.warning(f"\nSome repositories failed to clone: {', '.join(failed_repos)}")
